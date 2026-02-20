@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Investor Dejo — Web3 Technical Writer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050810;
+    --surface: #0b1120;
+    --surface2: #101828;
+    --accent: #00f5c3;
+    --accent2: #7b61ff;
+    --accent3: #ff6b6b;
+    --text: #e8eaf0;
+    --muted: #6b7a9a;
+    --border: rgba(0,245,195,0.15);
+    --glow: 0 0 40px rgba(0,245,195,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom Cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.2s, height 0.2s;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    width: 40px; height: 40px;
+    border: 1px solid rgba(0,245,195,0.5);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, width 0.3s, height 0.3s, opacity 0.3s;
+  }
+
+  /* Grid Background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,195,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,195,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Noise overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 4rem;
+    background: rgba(5,8,16,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .nav-logo span { color: var(--muted); }
+
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    text-decoration: none;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0; right: 0;
+    height: 1px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-links a:hover::after { transform: scaleX(1); }
+
+  /* SECTIONS */
+  section { position: relative; z-index: 2; }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 8rem 4rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg-circle {
+    position: absolute;
+    width: 800px; height: 800px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,245,195,0.06) 0%, transparent 70%);
+    top: 50%; left: 60%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero-bg-circle2 {
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(123,97,255,0.08) 0%, transparent 70%);
+    top: 20%; left: 10%;
+    pointer-events: none;
+  }
+
+  .hero-content { max-width: 900px; }
+
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .hero-tag::before {
+    content: '';
+    width: 2rem;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .hero-name {
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.4s forwards;
+  }
+
+  .hero-name .accent { 
+    color: var(--accent);
+    display: block;
+  }
+
+  .hero-title {
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    font-weight: 400;
+    color: var(--muted);
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.6s forwards;
+  }
+
+  .hero-title strong { color: var(--text); font-weight: 700; }
+
+  .hero-desc {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.9;
+    color: var(--muted);
+    max-width: 560px;
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.8s forwards;
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 1s forwards;
+  }
+
+  .btn {
+    padding: 0.85rem 2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.25s ease;
+    cursor: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 700;
+    box-shadow: 0 0 30px rgba(0,245,195,0.3);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 0 50px rgba(0,245,195,0.5);
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    border: 1px solid var(--border);
+    color: var(--text);
+    background: transparent;
+  }
+  .btn-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .hero-stats {
+    position: absolute;
+    right: 4rem;
+    bottom: 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    opacity: 0;
+    animation: fadeLeft 0.8s ease 1.2s forwards;
+  }
+
+  .stat {
+    text-align: right;
+  }
+
+  .stat-num {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+    display: block;
+  }
+
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* EXPERTISE */
+  #expertise {
+    padding: 8rem 4rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+  }
+
+  .section-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+  }
+
+  .section-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    margin-left: 1rem;
+  }
+
+  .expertise-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .expertise-card {
+    background: var(--bg);
+    padding: 2.5rem;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .expertise-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+    transform-origin: left;
+  }
+
+  .expertise-card:hover { background: var(--surface2); }
+  .expertise-card:hover::before { transform: scaleX(1); }
+
+  .card-icon {
+    font-size: 2rem;
+    margin-bottom: 1.25rem;
+    display: block;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.01em;
+  }
+
+  .card-desc {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 1.25rem;
+  }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* WORK SAMPLES */
+  #work {
+    padding: 8rem 4rem;
+  }
+
+  .work-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .work-card {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--surface);
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+  }
+
+  .work-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--glow);
+  }
+
+  .work-card.featured {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .work-visual {
+    height: 200px;
+    background: var(--surface2);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .work-card.featured .work-visual {
+    height: 100%;
+    min-height: 280px;
+  }
+
+  .work-visual-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.6;
+  }
+
+  .visual-defi { background: linear-gradient(135deg, #0a1628 0%, #001a33 50%, #002244 100%); }
+  .visual-dao { background: linear-gradient(135deg, #0d0a28 0%, #1a0033 50%, #220044 100%); }
+  .visual-l2 { background: linear-gradient(135deg, #0a2818 0%, #001a0d 50%, #002211 100%); }
+  .visual-nft { background: linear-gradient(135deg, #280a0a 0%, #330011 50%, #440022 100%); }
+  .visual-audit { background: linear-gradient(135deg, #1a1a0a 0%, #2a2a00 50%, #333300 100%); }
+
+  .visual-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    z-index: 1;
+    border: 1px solid rgba(0,245,195,0.2);
+    padding: 0.4rem 0.8rem;
+    border-radius: 2px;
+    background: rgba(0,245,195,0.05);
+  }
+
+  /* Animated dots */
+  .work-visual::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(0,245,195,0.15) 1px, transparent 1px);
+    background-size: 30px 30px;
+    opacity: 0.4;
+  }
+
+  .work-body { padding: 1.75rem; }
+  .work-card.featured .work-body { padding: 2.5rem; display: flex; flex-direction: column; justify-content: center; }
+
+  .work-type {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .work-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+  }
+
+  .work-card.featured .work-title {
+    font-size: 1.6rem;
+  }
+
+  .work-desc {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.8;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+  }
+
+  .work-meta {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  /* PROCESS */
+  #process {
+    padding: 8rem 4rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    position: relative;
+    margin-top: 4rem;
+  }
+
+  .process-steps::before {
+    content: '';
+    position: absolute;
+    top: 2rem;
+    left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    z-index: 0;
+  }
+
+  .step {
+    padding: 0 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step:first-child { padding-left: 0; }
+  .step:last-child { padding-right: 0; }
+
+  .step-dot {
+    width: 4rem; height: 4rem;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    margin-bottom: 1.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    position: relative;
+  }
+
+  .step-dot::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: rgba(0,245,195,0.05);
+  }
+
+  .step-title {
+    font-size: 1rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  .step-desc {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+
+  /* TOOLS */
+  #tools {
+    padding: 6rem 4rem;
+  }
+
+  .tools-marquee-wrapper {
+    overflow: hidden;
+    margin-top: 3rem;
+    padding: 1.5rem 0;
+    position: relative;
+  }
+
+  .tools-marquee-wrapper::before,
+  .tools-marquee-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 100px;
+    z-index: 1;
+  }
+  .tools-marquee-wrapper::before { left: 0; background: linear-gradient(90deg, var(--bg), transparent); }
+  .tools-marquee-wrapper::after { right: 0; background: linear-gradient(-90deg, var(--bg), transparent); }
+
+  .tools-marquee {
+    display: flex;
+    gap: 1.5rem;
+    animation: marquee 20s linear infinite;
+    width: max-content;
+  }
+
+  .tool-chip {
+    white-space: nowrap;
+    padding: 0.6rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    background: var(--surface);
+    transition: all 0.2s;
+  }
+
+  .tool-chip:hover {
+    color: var(--accent);
+    border-color: rgba(0,245,195,0.3);
+    background: rgba(0,245,195,0.03);
+  }
+
+  /* TESTIMONIALS */
+  #testimonials {
+    padding: 8rem 4rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 4rem;
+  }
+
+  .testimonial-card {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2rem;
+    background: var(--bg);
+    position: relative;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .testimonial-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 30px rgba(0,245,195,0.08);
+  }
+
+  .quote-mark {
+    font-size: 4rem;
+    line-height: 1;
+    color: var(--accent);
+    opacity: 0.2;
+    font-family: Georgia, serif;
+    margin-bottom: 0.5rem;
+  }
+
+  .testimonial-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.9;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    font-style: italic;
+  }
+
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .author-avatar {
+    width: 2.5rem; height: 2.5rem;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    background: var(--surface2);
+    flex-shrink: 0;
+  }
+
+  .author-name {
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+
+  .author-role {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  /* CONTACT */
+  #contact {
+    padding: 8rem 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #contact::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,245,195,0.05) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .contact-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+
+  .contact-title {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 1.5rem;
+  }
+
+  .contact-title .accent { color: var(--accent); }
+
+  .contact-desc {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.8;
+    max-width: 480px;
+    margin: 0 auto 3rem;
+  }
+
+  .contact-links {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 4rem;
+  }
+
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    padding: 0.6rem 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+
+  .contact-link:hover {
+    color: var(--accent);
+    border-color: rgba(0,245,195,0.3);
+    transform: translateY(-2px);
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 2rem 4rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface);
+    position: relative;
+    z-index: 2;
+  }
+
+  .footer-copy {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .footer-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+  }
+
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s ease infinite;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeLeft {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Glitch effect on hover */
+  .glitch {
+    position: relative;
+  }
+  .glitch:hover::before,
+  .glitch:hover::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .glitch:hover::before {
+    color: var(--accent2);
+    clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
+    transform: translateX(-2px);
+    animation: glitchA 0.3s linear;
+  }
+  .glitch:hover::after {
+    color: var(--accent3);
+    clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%);
+    transform: translateX(2px);
+    animation: glitchB 0.3s linear;
+  }
+  @keyframes glitchA {
+    0%, 100% { transform: translateX(-2px); }
+    50% { transform: translateX(2px); }
+  }
+  @keyframes glitchB {
+    0%, 100% { transform: translateX(2px); }
+    50% { transform: translateX(-2px); }
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    #hero, #expertise, #work, #process, #tools, #testimonials, #contact { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .work-grid { grid-template-columns: 1fr; }
+    .work-card.featured { grid-column: span 1; grid-template-columns: 1fr; }
+    .process-steps { grid-template-columns: 1fr 1fr; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .hero-stats { position: static; margin-top: 3rem; flex-direction: row; gap: 3rem; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><span>// </span>INVESTOR_DEJO<span>.web3</span></div>
+  <ul class="nav-links">
+    <li><a href="#expertise">Expertise</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#testimonials">Testimonials</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-circle"></div>
+  <div class="hero-bg-circle2"></div>
+  
+  <div class="hero-content">
+    <p class="hero-tag">Freelance · Available for new projects</p>
+  <h1 class="hero-name glitch" data-text="INVESTOR DEJO">
+      INVESTOR
+      <span class="accent">DEJO</span>
+    </h1>
+    <p class="hero-title">
+      <strong>Freelance Web3 Technical Writer</strong> — Turning protocol complexity into clear, compelling documentation
+    </p>
+    <p class="hero-desc">
+      I write whitepapers, developer docs, DeFi protocol guides, smart contract references, DAO governance frameworks, and L2 integration guides that builders, investors, and communities actually read. Freelance, flexible, and deeply Web3-native.
+    </p>
+    <div class="hero-ctas">
+      <a href="#work" class="btn btn-primary">View My Work</a>
+      <a href="#contact" class="btn btn-secondary">Let's Talk</a>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-num">30+</span>
+      <span class="stat-label">Protocols Documented</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">200K+</span>
+      <span class="stat-label">Words Published in Web3</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">3yrs</span>
+      <span class="stat-label">Web3 Writing Experience</span>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERTISE -->
+<section id="expertise">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Expertise</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="expertise-grid reveal">
+    <div class="expertise-card">
+      <span class="card-icon">⚡</span>
+      <h3 class="card-title">DeFi Protocol Documentation</h3>
+      <p class="card-desc">Comprehensive docs for AMMs, lending protocols, yield aggregators, and derivative platforms. From high-level overviews to precise mechanism specs.</p>
+      <div class="card-tags">
+        <span class="tag">Whitepapers</span>
+        <span class="tag">Litepaper</span>
+        <span class="tag">Tokenomics</span>
+      </div>
+    </div>
+    <div class="expertise-card">
+      <span class="card-icon">📜</span>
+      <h3 class="card-title">Smart Contract Docs</h3>
+      <p class="card-desc">Translating smart contract logic into plain-English references, integration explainers, and user guides — clearly, for any audience, at any level of technical depth.</p>
+      <div class="card-tags">
+        <span class="tag">Contract Explainers</span>
+        <span class="tag">Integration Guides</span>
+        <span class="tag">ABI References</span>
+      </div>
+    </div>
+    <div class="expertise-card">
+      <span class="card-icon">🏛️</span>
+      <h3 class="card-title">DAO & Governance</h3>
+      <p class="card-desc">Governance frameworks, proposal templates, voting guides, and constitutional documents. Building the written foundations of decentralized organizations.</p>
+      <div class="card-tags">
+        <span class="tag">Governance</span>
+        <span class="tag">Proposals</span>
+        <span class="tag">Frameworks</span>
+      </div>
+    </div>
+    <div class="expertise-card">
+      <span class="card-icon">🔗</span>
+      <h3 class="card-title">Layer 2 & Bridges</h3>
+      <p class="card-desc">User guides and technical specs for rollups, state channels, and cross-chain bridges. Explaining sequencers, fraud proofs, and ZK systems to all audiences.</p>
+      <div class="card-tags">
+        <span class="tag">Rollups</span>
+        <span class="tag">ZK Proofs</span>
+        <span class="tag">Bridges</span>
+      </div>
+    </div>
+    <div class="expertise-card">
+      <span class="card-icon">🌐</span>
+      <h3 class="card-title">General Web3 & Blockchain</h3>
+      <p class="card-desc">Ecosystem overviews, educational content, token launch documentation, integration guides, and technical blog series that grow communities and build credibility.</p>
+      <div class="card-tags">
+        <span class="tag">Education</span>
+        <span class="tag">Blog Series</span>
+        <span class="tag">Launch Docs</span>
+      </div>
+    </div>
+    <div class="expertise-card">
+      <span class="card-icon">🧑‍💻</span>
+      <h3 class="card-title">Developer Experience</h3>
+      <p class="card-desc">SDKs, API references, quickstarts, and tutorials written in close collaboration with your engineering team — so the details are right, and any developer can follow them.</p>
+      <div class="card-tags">
+        <span class="tag">API Docs</span>
+        <span class="tag">SDKs</span>
+        <span class="tag">Tutorials</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORK SAMPLES -->
+<section id="work">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Selected Work</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="work-grid">
+
+    <div class="work-card featured reveal">
+      <div class="work-visual visual-defi">
+        <div class="work-visual-bg"></div>
+        <span class="visual-label">// WHITEPAPER</span>
+      </div>
+      <div class="work-body">
+        <p class="work-type">DeFi Protocol · Whitepaper</p>
+        <h3 class="work-title">NovaDEX Automated Market Maker Whitepaper</h3>
+        <p class="work-desc">Researched and wrote the full whitepaper for a concentrated liquidity AMM — translating tick-based liquidity, capital efficiency, fee structures, and governance into precise, investor-grade prose. Read by 40,000+ LPs and investors.</p>
+        <div class="work-meta">
+          <span class="tag">AMM Design</span>
+          <span class="tag">Concentrated Liquidity</span>
+          <span class="tag">Tokenomics</span>
+          <span class="tag">Gitbook</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="work-card reveal">
+      <div class="work-visual visual-dao">
+        <div class="work-visual-bg"></div>
+        <span class="visual-label">// DAO DOCS</span>
+      </div>
+      <div class="work-body">
+        <p class="work-type">DAO · Governance Framework</p>
+        <h3 class="work-title">ArcadeDAO Constitution & Governance Handbook</h3>
+        <p class="work-desc">Complete governance framework for a $120M gaming DAO — proposal lifecycle, quorum rules, treasury policy, and delegate handbook.</p>
+        <div class="work-meta">
+          <span class="tag">Governance</span>
+          <span class="tag">Treasury</span>
+          <span class="tag">Delegates</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="work-card reveal">
+      <div class="work-visual visual-l2">
+        <div class="work-visual-bg"></div>
+        <span class="visual-label">// DEV DOCS</span>
+      </div>
+      <div class="work-body">
+        <p class="work-type">Layer 2 · Developer Documentation</p>
+        <h3 class="work-title">OptimisticStack SDK Docs & Quickstart</h3>
+        <p class="work-desc">End-to-end developer docs for an Optimistic rollup SDK. Reduced average developer onboarding time from 4 days to under 8 hours.</p>
+        <div class="work-meta">
+          <span class="tag">SDK</span>
+          <span class="tag">Rollup</span>
+          <span class="tag">Quickstart</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="work-card reveal">
+      <div class="work-visual visual-audit">
+        <div class="work-visual-bg"></div>
+        <span class="visual-label">// SECURITY</span>
+      </div>
+      <div class="work-body">
+        <p class="work-type">Security · Audit Communication</p>
+        <h3 class="work-title">Velvet Finance Post-Audit Report & Remediation Docs</h3>
+        <p class="work-desc">Translated a 48-page smart contract audit into digestible risk summaries, remediation timelines, and a community transparency report.</p>
+        <div class="work-meta">
+          <span class="tag">Audit</span>
+          <span class="tag">Postmortem</span>
+          <span class="tag">Risk</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2 class="section-title">My Process</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="process-steps reveal">
+    <div class="step">
+      <div class="step-dot">01</div>
+      <h3 class="step-title">Protocol Immersion</h3>
+      <p class="step-desc">I study docs, attend team calls, test the product, and ask the right questions until I understand it deeply. That understanding comes before a single word is written.</p>
+    </div>
+    <div class="step">
+      <div class="step-dot">02</div>
+      <h3 class="step-title">Audience Mapping</h3>
+      <p class="step-desc">Identifying exactly who will read each doc — anon degens, institutional LPs, core devs, or regulators — and calibrating accordingly.</p>
+    </div>
+    <div class="step">
+      <div class="step-dot">03</div>
+      <h3 class="step-title">Draft & Review</h3>
+      <p class="step-desc">Iterative drafting with your team. I work in Notion, GitHub, or whatever your stack uses. Async-first, responsive to feedback.</p>
+    </div>
+    <div class="step">
+      <div class="step-dot">04</div>
+      <h3 class="step-title">Ship & Maintain</h3>
+      <p class="step-desc">Final delivery + optional ongoing retainer for updates. Docs are living documents — especially in Web3.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section id="tools">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Tools & Ecosystem Knowledge</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="tools-marquee-wrapper">
+    <div class="tools-marquee">
+      <span class="tool-chip">Ethereum</span>
+      <span class="tool-chip">Solidity</span>
+      <span class="tool-chip">Uniswap v3/v4</span>
+      <span class="tool-chip">Aave</span>
+      <span class="tool-chip">Compound</span>
+      <span class="tool-chip">Arbitrum</span>
+      <span class="tool-chip">Optimism</span>
+      <span class="tool-chip">zkSync</span>
+      <span class="tool-chip">StarkNet</span>
+      <span class="tool-chip">Polygon</span>
+      <span class="tool-chip">Mirror</span>
+      <span class="tool-chip">Substack</span>
+      <span class="tool-chip">The Graph</span>
+      <span class="tool-chip">Chainlink</span>
+      <span class="tool-chip">IPFS</span>
+      <span class="tool-chip">Gitbook</span>
+      <span class="tool-chip">Notion</span>
+      <span class="tool-chip">GitHub</span>
+      <span class="tool-chip">Docusaurus</span>
+      <span class="tool-chip">LaTeX</span>
+      <!-- Duplicated for seamless loop -->
+      <span class="tool-chip">Ethereum</span>
+      <span class="tool-chip">Solidity</span>
+      <span class="tool-chip">Uniswap v3/v4</span>
+      <span class="tool-chip">Aave</span>
+      <span class="tool-chip">Compound</span>
+      <span class="tool-chip">Arbitrum</span>
+      <span class="tool-chip">Optimism</span>
+      <span class="tool-chip">zkSync</span>
+      <span class="tool-chip">StarkNet</span>
+      <span class="tool-chip">Polygon</span>
+      <span class="tool-chip">Mirror</span>
+      <span class="tool-chip">Substack</span>
+      <span class="tool-chip">The Graph</span>
+      <span class="tool-chip">Chainlink</span>
+      <span class="tool-chip">IPFS</span>
+      <span class="tool-chip">Gitbook</span>
+      <span class="tool-chip">Notion</span>
+      <span class="tool-chip">GitHub</span>
+      <span class="tool-chip">Docusaurus</span>
+      <span class="tool-chip">LaTeX</span>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2 class="section-title">What Teams Say</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="testimonials-grid">
+    <div class="testimonial-card reveal">
+      <div class="quote-mark">"</div>
+      <p class="testimonial-text">Dejo turned our half-finished internal notion pages into documentation that actually helped developers integrate. We went from 2 support tickets a day to near zero within a month of the new docs going live.</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">🧑</div>
+        <div>
+          <p class="author-name">Marcus T.</p>
+          <p class="author-role">Head of DevRel · OptimisticStack</p>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal">
+      <div class="quote-mark">"</div>
+      <p class="testimonial-text">The whitepaper Dejo wrote was cited in three separate VC investment memos. It gave institutional investors exactly the clarity they needed to feel confident leading our Series A.</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">👩</div>
+        <div>
+          <p class="author-name">Priya R.</p>
+          <p class="author-role">Co-Founder & CEO · NovaDEX</p>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal">
+      <div class="quote-mark">"</div>
+      <p class="testimonial-text">Genuinely rare to find a writer who grasps the technical depth AND can explain it so non-technical people actually trust it. Dejo did both. Our community went from confused to confidently participating in governance.</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">🧔</div>
+        <div>
+          <p class="author-name">Elliot K.</p>
+          <p class="author-role">Governance Lead · ArcadeDAO</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <p class="contact-eyebrow reveal">— Let's Build Together —</p>
+  <h2 class="contact-title reveal">
+    Ready to make your<br>protocol <span class="accent">legible</span>?
+  </h2>
+  <p class="contact-desc reveal">
+    Whether you need a whitepaper from scratch, developer docs that actually help, or a governance system that runs itself — let's talk.
+  </p>
+  <div class="contact-links reveal">
+    <a href="mailto:dejo@InvestorDejo.xyz" class="contact-link">
+      <span>✉</span> dejo@InvestorDejo.xyz
+    </a>
+    <a href="#" class="contact-link">
+      <span>🐦</span> @InvestorDejo
+    </a>
+    <a href="#" class="contact-link">
+      <span>💼</span> LinkedIn
+    </a>
+    <a href="#" class="contact-link">
+      <span>🐙</span> GitHub
+    </a>
+    <a href="#" class="contact-link">
+      <span>🔵</span> Farcaster
+    </a>
+  </div>
+  <a href="mailto:dejo@InvestorDejo.xyz" class="btn btn-primary reveal">Send a Message →</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p class="footer-copy">© 2025 Investor Dejo · Freelance Web3 Technical Writer</p>
+  <div class="footer-status">
+    <div class="status-dot"></div>
+    Available for new projects
+  </div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '20px';
+      cursor.style.height = '20px';
+      ring.style.width = '60px';
+      ring.style.height = '60px';
+      ring.style.opacity = '0.5';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '12px';
+      cursor.style.height = '12px';
+      ring.style.width = '40px';
+      ring.style.height = '40px';
+      ring.style.opacity = '1';
+    });
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 100);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
